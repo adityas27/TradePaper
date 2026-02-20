@@ -1,0 +1,30 @@
+# Python byte code and caches
+*.py[cod]
+__pycache__/
+
+# Django specific
+*.log
+*.pot
+local_settings.py
+db.sqlite3
+/media
+
+# Virtual environments
+venv/
+env/
+ENV/
+env.bak/
+venv.bak/
+
+# Node modules (if used for front-end assets)
+node_modules/
+
+# Windows system files
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Additional directories (if relevant)
+Scripts/
+Lib/
+Include/
