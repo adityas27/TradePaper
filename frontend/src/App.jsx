@@ -11,6 +11,7 @@ import Watchlist from './pages/Watchlist';
 import Leaderboard from './pages/Leaderboard';
 import LearnTrading from './pages/LearnTrading';
 import Settings from './pages/Settings';
+import Profile from './pages/Profile';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 
@@ -25,6 +26,7 @@ function App() {
               <Route index element={<Dashboard />} />
               <Route path="login" element={<Login />} />
               <Route path="signup" element={<SignUp />} />
+              <Route path="profile" element={<Profile />} />
               <Route path="market" element={<Market />} />
               <Route path="portfolio" element={<Portfolio />} />
               <Route path="trade-history" element={<TradeHistory />} />

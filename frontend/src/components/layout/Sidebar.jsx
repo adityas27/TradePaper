@@ -8,6 +8,7 @@ const navItems = [
   { to: '/watchlist', label: 'Watchlist' },
   { to: '/leaderboard', label: 'Leaderboard' },
   { to: '/learn-trading', label: 'Learn Trading' },
+  { to: '/profile', label: 'Profile' },
   { to: '/settings', label: 'Settings' },
 ];
 
