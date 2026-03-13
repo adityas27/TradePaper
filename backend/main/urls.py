@@ -5,6 +5,8 @@ urlpatterns = [
     # Ticker endpoints
     path('tickers/', views.ticker_list, name='ticker-list'),
     path('tickers/<str:symbol>/', views.ticker_detail, name='ticker-detail'),
+    path('tickers/<str:symbol>/price/', views.ticker_price, name='ticker-price'),
+    path('tickers/<str:symbol>/ohlc/', views.ticker_ohlc, name='ticker-ohlc'),
     
     # Watchlist endpoints
     path('watchlist/', views.watchlist_list, name='watchlist-list'),

@@ -8,6 +8,7 @@ import Market from './pages/Market';
 import Portfolio from './pages/Portfolio';
 import TradeHistory from './pages/TradeHistory';
 import Watchlist from './pages/Watchlist';
+import TickerDetails from './pages/TickerDetails';
 import Leaderboard from './pages/Leaderboard';
 import LearnTrading from './pages/LearnTrading';
 import Settings from './pages/Settings';
@@ -28,6 +29,7 @@ function App() {
               <Route path="signup" element={<SignUp />} />
               <Route path="profile" element={<Profile />} />
               <Route path="market" element={<Market />} />
+              <Route path="ticker/:symbol" element={<TickerDetails />} />
               <Route path="portfolio" element={<Portfolio />} />
               <Route path="trade-history" element={<TradeHistory />} />
               <Route path="watchlist" element={<Watchlist />} />

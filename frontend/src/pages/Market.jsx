@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import RiskMeter from '../components/ui/RiskMeter';
@@ -17,6 +18,7 @@ const STOCK_INFO = {
 };
 
 export default function Market() {
+  const navigate = useNavigate();
   const [searchQuery, setSearchQuery] = useState('');
   const [quantities, setQuantities] = useState({});
   const [prices, setPrices] = useState({});
@@ -219,7 +221,23 @@ export default function Market() {
                   return (
                     <React.Fragment key={stock.symbol}>
                       <tr>
-                        <td className="font-weight-600">{stock.symbol}</td>
+                        <td className="font-weight-600">
+                          <button
+                            onClick={() => navigate(`/ticker/${stock.symbol}`)}
+                            style={{
+                              background: 'none',
+                              border: 'none',
+                              color: 'var(--primary-color)',
+                              cursor: 'pointer',
+                              textDecoration: 'underline',
+                              fontSize: 'inherit',
+                              fontWeight: 'inherit',
+                              padding: 0
+                            }}
+                          >
+                            {stock.symbol}
+                          </button>
+                        </td>
                         <td>{stock.companyName}</td>
                         <td className="text-right">${stock.price.toFixed(2)}</td>
 

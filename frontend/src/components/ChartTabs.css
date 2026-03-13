@@ -1,0 +1,160 @@
+/* Chart Tabs Container */
+.chart-tabs-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  padding: 20px;
+  background-color: var(--bg-primary);
+  border-radius: 8px;
+  border: 1px solid var(--border-color);
+}
+
+/* Chart Tabs Header */
+.chart-tabs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+/* Chart Type Tabs */
+.chart-type-tabs {
+  display: flex;
+  gap: 8px;
+}
+
+.tab-button {
+  padding: 8px 16px;
+  background-color: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.tab-button:hover {
+  background-color: var(--bg-hover);
+  border-color: var(--accent-color);
+}
+
+.tab-button.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Timeframe Selector */
+.timeframe-selector {
+  display: flex;
+  gap: 6px;
+  flex-wrap: wrap;
+}
+
+.timeframe-button {
+  padding: 6px 12px;
+  background-color: transparent;
+  border: 1px solid var(--border-color);
+  border-radius: 4px;
+  color: var(--text-secondary);
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 600;
+  transition: all 0.2s ease;
+  white-space: nowrap;
+}
+
+.timeframe-button:hover {
+  background-color: var(--bg-secondary);
+  border-color: var(--accent-color);
+  color: var(--accent-color);
+}
+
+.timeframe-button.active {
+  background-color: var(--accent-color);
+  color: white;
+  border-color: var(--accent-color);
+}
+
+/* Chart Content */
+.chart-content {
+  min-height: 350px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow-x: auto;
+  padding: 20px 0;
+}
+
+/* Chart Info */
+.chart-info {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+  gap: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--border-color);
+  font-size: 13px;
+}
+
+.info-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+}
+
+.info-label {
+  color: var(--text-secondary);
+  font-weight: 500;
+}
+
+.info-value {
+  color: var(--text-primary);
+  font-weight: 600;
+}
+
+/* Responsive Design */
+@media (max-width: 768px) {
+  .chart-tabs-header {
+    flex-direction: column;
+    align-items: flex-start;
+  }
+
+  .chart-type-tabs {
+    width: 100%;
+  }
+
+  .timeframe-selector {
+    width: 100%;
+  }
+
+  .chart-info {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Dark Mode Adjustments */
+:root {
+  --accent-color: #007bff;
+  --bg-hover: rgba(0, 123, 255, 0.1);
+}
+
+@media (prefers-color-scheme: dark) {
+  .chart-tabs-container {
+    background-color: var(--bg-primary);
+  }
+
+  .tab-button {
+    background-color: var(--bg-secondary);
+  }
+
+  .tab-button:hover {
+    background-color: var(--bg-hover);
+  }
+}

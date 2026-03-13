@@ -15,6 +15,7 @@ from .serializers import (
     TradeTransactionSerializer,
     WatchlistSerializer,
 )
+from .services.market import get_live_price, get_ohlc_data
 
 
 # ============================================================================
@@ -37,6 +38,24 @@ def ticker_detail(request, symbol):
     ticker = get_object_or_404(Ticker, symbol=symbol)
     serializer = TickerDetailSerializer(ticker, context={'request': request})
     return Response(serializer.data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def ticker_price(request, symbol):
+    """Get live price for ticker from FastAPI service"""
+    ticker = get_object_or_404(Ticker, symbol=symbol)
+    price_data = get_live_price(symbol)
+    return Response(price_data)
+
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def ticker_ohlc(request, symbol):
+    """Get OHLC data for ticker from FastAPI service"""
+    ticker = get_object_or_404(Ticker, symbol=symbol)
+    ohlc_data = get_ohlc_data(symbol)
+    return Response(ohlc_data, status=status.HTTP_200_OK if ohlc_data else status.HTTP_204_NO_CONTENT)
 
 
 # ============================================================================
