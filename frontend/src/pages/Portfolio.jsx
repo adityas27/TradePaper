@@ -1,12 +1,26 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import { useTrading } from '../context/TradingContext';
-import { getCurrentPrice } from '../data/mockStocks';
+import * as tradingAPI from '../api/trading';
 
 export default function Portfolio() {
-  const { portfolio, sellStock } = useTrading();
+  const [prices, setPrices] = useState({});
   const [quantities, setQuantities] = useState({});
+  const [statusMessage, setStatusMessage] = useState('');
+  const [isSelling, setIsSelling] = useState({});
+
+  const { portfolio, holdings, balance, sellStock } = useTrading();
+
+  // Connect to WebSocket for live prices
+  useEffect(() => {
+    const ws = new WebSocket('ws://localhost:8001/ws/prices');
+    ws.onmessage = (event) => {
+      const data = JSON.parse(event.data);
+      setPrices(data);
+    };
+    return () => ws.close();
+  }, []);
 
   const handleQuantityChange = (symbol, value) => {
     const num = parseInt(value, 10);
@@ -16,40 +30,51 @@ export default function Portfolio() {
     }));
   };
 
-  const handleSell = (symbol, price, maxQty) => {
+  const handleSell = async (symbol, maxQty) => {
     const qty = quantities[symbol];
     if (!qty || qty < 1) {
-      alert('Please enter a valid quantity.');
+      setStatusMessage('❌ Please enter a valid quantity.');
       return;
     }
     if (qty > maxQty) {
-      alert('You cannot sell more than you own.');
+      setStatusMessage('❌ You cannot sell more than you own.');
       return;
     }
-    const success = sellStock(symbol, price, qty);
-    if (!success) {
-      alert('Unable to sell. Check your quantity.');
-      return;
+
+    setIsSelling((prev) => ({ ...prev, [symbol]: true }));
+    setStatusMessage(`⏳ Selling ${qty} shares of ${symbol}...`);
+
+    try {
+      const success = await sellStock(symbol, qty, prices[symbol] || 0);
+      
+      if (success) {
+        setStatusMessage(`✅ Successfully sold ${qty} shares of ${symbol}!`);
+        setQuantities((prev) => ({ ...prev, [symbol]: '' }));
+        setTimeout(() => setStatusMessage(''), 3000);
+      } else {
+        setStatusMessage('❌ Sale failed. Please try again.');
+      }
+    } catch (err) {
+      setStatusMessage(`❌ Error: ${err.message}`);
+    } finally {
+      setIsSelling((prev) => ({ ...prev, [symbol]: false }));
     }
-    setQuantities((prev) => ({ ...prev, [symbol]: '' }));
   };
 
-  const holdings = portfolio.map((p) => {
-    const currentPrice = getCurrentPrice(p.symbol) ?? p.avgBuyPrice;
-    const pnl = (currentPrice - p.avgBuyPrice) * p.quantity;
+  const holdingsWithPrices = holdings.map(h => {
+    const currentPrice = prices[h.ticker_symbol] || parseFloat(h.avg_buy_price);
+    const pnl = (currentPrice - parseFloat(h.avg_buy_price)) * h.quantity;
     return {
-      ...p,
+      ...h,
       currentPrice,
-      pnl: Math.round(pnl * 100) / 100,
+      pnl
     };
   });
 
-  const totalInvested = holdings.reduce((sum, h) => sum + h.quantity * h.avgBuyPrice, 0);
-  const totalValue = holdings.reduce((sum, h) => sum + h.quantity * h.currentPrice, 0);
-  const highestPercentage =
-    totalValue > 0
-      ? Math.max(...holdings.map((h) => (h.quantity * h.currentPrice) / totalValue))
-      : 0;
+  const totalValue = holdingsWithPrices.reduce((sum, h) => sum + h.quantity * h.currentPrice, 0);
+  const highestPercentage = totalValue > 0
+    ? Math.max(...holdingsWithPrices.map((h) => (h.quantity * h.currentPrice) / totalValue))
+    : 0;
   const diversificationScore = Math.min(100, Math.max(0, Math.round(100 - highestPercentage * 100)));
 
   const getDiversificationLabel = (score) => {
@@ -62,10 +87,29 @@ export default function Portfolio() {
     <div className="page">
       <h1 className="page-title">Portfolio</h1>
       <div className="page-content">
+        {statusMessage && (
+          <div style={{
+            padding: '12px 16px',
+            marginBottom: '16px',
+            backgroundColor: statusMessage.includes('✅') ? '#f0f5f0' : '#fff5f5',
+            borderLeft: `4px solid ${statusMessage.includes('✅') ? '#34c759' : '#ff3b30'}`,
+            color: statusMessage.includes('✅') ? '#34c759' : '#ff3b30',
+          }}>
+            {statusMessage}
+          </div>
+        )}
+
+        {portfolio && (
+          <Card style={{ marginBottom: '24px' }}>
+            <h3 className="card-title">Balance</h3>
+            <div className="card-value">${balance.toFixed(2)}</div>
+          </Card>
+        )}
+
         <section>
           <h2 className="section-title">Holdings</h2>
           <Card>
-            {holdings.length === 0 ? (
+            {holdingsWithPrices.length === 0 ? (
               <p className="empty-state">No holdings yet. Buy stocks from the Market.</p>
             ) : (
               <div className="table-wrapper">
@@ -82,11 +126,11 @@ export default function Portfolio() {
                     </tr>
                   </thead>
                   <tbody>
-                    {holdings.map((holding) => (
-                      <tr key={holding.symbol}>
-                        <td className="font-weight-600">{holding.symbol}</td>
+                    {holdingsWithPrices.map((holding) => (
+                      <tr key={holding.ticker_symbol}>
+                        <td className="font-weight-600">{holding.ticker_symbol}</td>
                         <td className="text-right">{holding.quantity}</td>
-                        <td className="text-right">${holding.avgBuyPrice.toFixed(2)}</td>
+                        <td className="text-right">${parseFloat(holding.avg_buy_price).toFixed(2)}</td>
                         <td className="text-right">${holding.currentPrice.toFixed(2)}</td>
                         <td className="text-right">
                           <span className={`pnl-value ${holding.pnl >= 0 ? 'text-positive' : 'text-negative'}`}>
@@ -100,17 +144,18 @@ export default function Portfolio() {
                             max={holding.quantity}
                             className="quantity-input"
                             placeholder="0"
-                            value={quantities[holding.symbol] || ''}
-                            onChange={(e) => handleQuantityChange(holding.symbol, e.target.value)}
+                            value={quantities[holding.ticker_symbol] || ''}
+                            onChange={(e) => handleQuantityChange(holding.ticker_symbol, e.target.value)}
                           />
                         </td>
                         <td>
                           <Button
                             variant="secondary"
                             className="btn-sm"
-                            onClick={() => handleSell(holding.symbol, holding.currentPrice, holding.quantity)}
+                            onClick={() => handleSell(holding.ticker_symbol, holding.quantity)}
+                            disabled={isSelling[holding.ticker_symbol] || !quantities[holding.ticker_symbol]}
                           >
-                            Sell
+                            {isSelling[holding.ticker_symbol] ? 'Selling...' : 'Sell'}
                           </Button>
                         </td>
                       </tr>
@@ -128,21 +173,20 @@ export default function Portfolio() {
             <div className="diversification-placeholder">
               <div
                 className="diversification-ring diversification-score-circle"
-                style={{ '--score': holdings.length > 0 ? diversificationScore : 0 }}
+                style={{ '--score': holdingsWithPrices.length > 0 ? diversificationScore : 0 }}
                 data-score={diversificationScore}
               >
-                <span>{holdings.length > 0 ? diversificationScore : '--'}</span>
+                <span>{holdingsWithPrices.length > 0 ? diversificationScore : '--'}</span>
               </div>
               <p className="diversification-label">
-                Score: {holdings.length > 0 ? `${diversificationScore} / 100` : '-- / 100'}
+                Score: {holdingsWithPrices.length > 0 ? `${diversificationScore} / 100` : '-- / 100'}
               </p>
-              <p className={`diversification-classification diversification-${holdings.length > 0 ? (diversificationScore >= 80 ? 'high' : diversificationScore >= 50 ? 'medium' : 'low') : 'none'}`}>
-                {holdings.length > 0 ? getDiversificationLabel(diversificationScore) : '—'}
+              <p className={`diversification-classification diversification-${holdingsWithPrices.length > 0 ? (diversificationScore >= 80 ? 'high' : diversificationScore >= 50 ? 'medium' : 'low') : 'none'}`}>
+                {holdingsWithPrices.length > 0 ? getDiversificationLabel(diversificationScore) : '—'}
               </p>
             </div>
             <p className="card-description">
-              A higher diversification score indicates your portfolio is spread across different
-              sectors and asset types, which can help reduce risk.
+              A higher diversification score indicates your portfolio is spread across different stocks.
             </p>
           </Card>
         </section>

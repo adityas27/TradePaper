@@ -194,7 +194,7 @@ function Profile() {
                 }}>
                   {profile.profile_image ? (
                     <img
-                      src={`http://localhost:8000${profile.profile_image}`}
+                      src={`http://127.0.0.1:8000${profile.profile_image}`}
                       alt="Profile"
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />
@@ -316,7 +316,7 @@ function Profile() {
                     />
                   ) : profile.profile_image ? (
                     <img
-                      src={`http://localhost:8000${profile.profile_image}`}
+                      src={`http://127.0.0.1:8000${profile.profile_image}`}
                       alt="Profile"
                       style={{ width: '100%', height: '100%', objectFit: 'cover' }}
                     />

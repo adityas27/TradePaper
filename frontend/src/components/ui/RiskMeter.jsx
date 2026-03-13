@@ -10,16 +10,28 @@ export default function RiskMeter({ investmentAmount, balance, portfolio, symbol
 
   const balancePercent = (investmentAmount / balance) * 100;
 
-  const portfolioValue = portfolio.reduce((sum, p) => {
-    const price = p.avgBuyPrice;
-    return sum + p.quantity * price;
-  }, 0);
+  // Handle portfolio being either an object or an array of holdings
+  let portfolioValue = 0;
+  let currentStockValue = 0;
 
-  const currentStockValue = portfolio.find((p) => p.symbol === symbol)
-    ? portfolio.find((p) => p.symbol === symbol).quantity * portfolio.find((p) => p.symbol === symbol).avgBuyPrice
-    : 0;
+  if (Array.isArray(portfolio)) {
+    // Legacy array format
+    portfolioValue = portfolio.reduce((sum, p) => {
+      const price = p.avgBuyPrice;
+      return sum + p.quantity * price;
+    }, 0);
 
-  const totalAfterPurchase = portfolioValue - currentStockValue + investmentAmount;
+    const currentPos = portfolio.find((p) => p.symbol === symbol);
+    if (currentPos) {
+      currentStockValue = currentPos.quantity * currentPos.avgBuyPrice;
+    }
+  } else {
+    // Portfolio object format - concentration is just based on investment vs balance
+    portfolioValue = 0; // No existing holdings in object format
+    currentStockValue = 0;
+  }
+
+  const totalAfterPurchase = portfolioValue + investmentAmount;
   const newStockValue = currentStockValue + investmentAmount;
   const concentrationPercent = totalAfterPurchase > 0 ? (newStockValue / totalAfterPurchase) * 100 : 100;
 

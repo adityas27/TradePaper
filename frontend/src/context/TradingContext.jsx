@@ -1,103 +1,117 @@
-import { createContext, useContext, useState, useCallback } from 'react';
+import { createContext, useContext, useState, useCallback, useEffect } from 'react';
+import * as tradingAPI from '../api/trading';
 
 const TradingContext = createContext();
 
-function generateId() {
-  return Date.now().toString(36) + Math.random().toString(36).slice(2);
-}
-
-function formatAmount(value) {
-  return Math.round(value * 100) / 100;
-}
-
 export function TradingProvider({ children }) {
-  const [balance, setBalance] = useState(100000);
-  const [portfolio, setPortfolio] = useState([]);
-  const [transactions, setTransactions] = useState([]);
+  const [portfolioData, setPortfolioData] = useState(null);
+  const [holdings, setHoldings] = useState([]);
+  const [balance, setBalance] = useState(0);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
 
-  const buyStock = useCallback((symbol, price, quantity) => {
-    const cost = formatAmount(price * quantity);
-    if (balance < cost) {
+  // Fetch portfolio data on mount
+  useEffect(() => {
+    loadPortfolioData();
+  }, []);
+
+  const loadPortfolioData = async () => {
+    try {
+      setLoading(true);
+      setError(null);
+      
+      const portfolios = await tradingAPI.getPortfolios();
+      let portfolio = portfolios[0];
+
+      if (!portfolio) {
+        portfolio = await tradingAPI.createPortfolio('My Portfolio');
+      }
+
+      setPortfolioData(portfolio);
+      setBalance(parseFloat(portfolio.balance));
+
+      // Fetch holdings
+      const holdingsData = await tradingAPI.getPortfolioHoldings(portfolio.id);
+      setHoldings(holdingsData);
+    } catch (err) {
+      console.error('Failed to load portfolio data:', err);
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const buyStock = useCallback(async (symbol, price, quantity) => {
+    if (!portfolioData) {
+      setError('Portfolio not loaded');
       return false;
     }
 
-    setBalance((prev) => formatAmount(prev - cost));
+    try {
+      const result = await tradingAPI.buyStock(portfolioData.id, symbol, quantity, price);
+      
+      // Update local state
+      setBalance(parseFloat(result.portfolio_balance));
+      
+      // Reload holdings
+      const holdingsData = await tradingAPI.getPortfolioHoldings(portfolioData.id);
+      setHoldings(holdingsData);
+      
+      return true;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.message || 'Purchase failed';
+      setError(errorMsg);
+      return false;
+    }
+  }, [portfolioData]);
 
-    setPortfolio((prev) => {
-      const existing = prev.find((p) => p.symbol === symbol);
-      if (existing) {
-        const totalQuantity = existing.quantity + quantity;
-        const totalCost = formatAmount(existing.avgBuyPrice * existing.quantity + cost);
-        const newAvgBuyPrice = formatAmount(totalCost / totalQuantity);
-        return prev.map((p) =>
-          p.symbol === symbol
-            ? { symbol, quantity: totalQuantity, avgBuyPrice: newAvgBuyPrice }
-            : p
-        );
-      }
-      return [...prev, { symbol, quantity, avgBuyPrice: price }];
-    });
+  const sellStock = useCallback(async (symbol, quantity, price) => {
+    if (!portfolioData) {
+      setError('Portfolio not loaded');
+      return false;
+    }
 
-    const transaction = {
-      id: generateId(),
-      symbol,
-      type: 'BUY',
-      quantity,
-      price,
-      date: new Date().toISOString().slice(0, 10),
-      journalNote: '',
-    };
-    setTransactions((prev) => [transaction, ...prev]);
-    return true;
-  }, [balance]);
+    try {
+      const result = await tradingAPI.sellStock(portfolioData.id, symbol, quantity, price);
+      
+      // Update local state
+      setBalance(parseFloat(result.portfolio_balance));
+      
+      // Reload holdings
+      const holdingsData = await tradingAPI.getPortfolioHoldings(portfolioData.id);
+      setHoldings(holdingsData);
+      
+      return true;
+    } catch (err) {
+      const errorMsg = err.response?.data?.error || err.message || 'Sale failed';
+      setError(errorMsg);
+      return false;
+    }
+  }, [portfolioData]);
 
-  const sellStock = useCallback((symbol, price, quantity) => {
-    const existing = portfolio.find((p) => p.symbol === symbol);
-    if (!existing) return false;
-    if (existing.quantity < quantity) return false;
-
-    const proceeds = formatAmount(price * quantity);
-    setBalance((prev) => formatAmount(prev + proceeds));
-
-    setPortfolio((prev) => {
-      const item = prev.find((p) => p.symbol === symbol);
-      const newQuantity = item.quantity - quantity;
-      if (newQuantity === 0) {
-        return prev.filter((p) => p.symbol !== symbol);
-      }
-      return prev.map((p) =>
-        p.symbol === symbol ? { ...p, quantity: newQuantity } : p
-      );
-    });
-
-    const transaction = {
-      id: generateId(),
-      symbol,
-      type: 'SELL',
-      quantity,
-      price,
-      date: new Date().toISOString().slice(0, 10),
-      journalNote: '',
-    };
-    setTransactions((prev) => [transaction, ...prev]);
-    return true;
-  }, [portfolio]);
-
-  const addJournalNote = useCallback((transactionId, note) => {
-    setTransactions((prev) =>
-      prev.map((t) =>
-        t.id === transactionId ? { ...t, journalNote: note } : t
-      )
-    );
-  }, []);
+  const refreshPortfolio = useCallback(async () => {
+    if (!portfolioData) return;
+    
+    try {
+      const updated = await tradingAPI.getPortfolioDetail(portfolioData.id);
+      setPortfolioData(updated);
+      setBalance(parseFloat(updated.balance));
+      setHoldings(updated.positions || []);
+    } catch (err) {
+      console.error('Failed to refresh portfolio:', err);
+    }
+  }, [portfolioData]);
 
   const value = {
+    portfolio: portfolioData,
+    holdings,
     balance,
-    portfolio,
-    transactions,
+    loading,
+    error,
     buyStock,
     sellStock,
-    addJournalNote,
+    refreshPortfolio,
+    loadPortfolioData,
   };
 
   return (

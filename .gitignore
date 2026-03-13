@@ -28,3 +28,5 @@ Desktop.ini
 Scripts/
 Lib/
 Include/
+
+.vscode
