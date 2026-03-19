@@ -1,8 +1,8 @@
 import React, { useState, useEffect } from 'react';
 import { useParams, useNavigate } from 'react-router-dom';
+import { Star, TrendingUp, TrendingDown } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
-import ChartTabs from '../components/ChartTabs';
 import * as tradingAPI from '../api/trading';
 import api from '../api/api';
 import '../styles/TickerDetails.css';
@@ -12,7 +12,6 @@ export default function TickerDetails() {
   const navigate = useNavigate();
   const [ticker, setTicker] = useState(null);
   const [livePrice, setLivePrice] = useState(null);
-  const [ohlcData, setOhlcData] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [inWatchlist, setInWatchlist] = useState(false);
@@ -26,16 +25,14 @@ export default function TickerDetails() {
       setError('');
       
       try {
-        const [tickerRes, priceRes, ohlcRes] = await Promise.all([
+        const [tickerRes, priceRes] = await Promise.all([
           api.get(`tickers/${symbol}/`),
-          api.get(`tickers/${symbol}/price/`),
-          api.get(`tickers/${symbol}/ohlc/`)
+          api.get(`tickers/${symbol}/price/`)
         ]);
         
         setTicker(tickerRes.data);
         setInWatchlist(tickerRes.data.in_watchlist);
         setLivePrice(priceRes.data.price);
-        setOhlcData(ohlcRes.data || []);
       } catch (err) {
         setError('Failed to load ticker details');
         console.error(err);
@@ -145,8 +142,9 @@ export default function TickerDetails() {
                 variant={inWatchlist ? 'secondary' : 'primary'}
                 onClick={handleToggleWatchlist}
                 fullWidth
+                icon={<Star size={18} fill={inWatchlist ? 'currentColor' : 'none'} />}
               >
-                {inWatchlist ? '★ Remove from Watchlist' : '☆ Add to Watchlist'}
+                {inWatchlist ? 'Remove from Watchlist' : 'Add to Watchlist'}
               </Button>
             </div>
 
@@ -193,8 +191,16 @@ export default function TickerDetails() {
 
       <div className="ticker-charts">
         <Card>
-          <h3 className="card-title">Price Charts</h3>
-          <ChartTabs data={ohlcData} symbol={symbol} />
+          <h3 className="card-title">Charts</h3>
+          <p className="ticker-description">Open full chart pages for better zoom, pan, and interaction.</p>
+          <div className="ticker-actions">
+            <Button onClick={() => navigate(`/ticker/${symbol}/candles`)} fullWidth>
+              Open Candlestick Chart
+            </Button>
+            <Button variant="secondary" onClick={() => navigate(`/ticker/${symbol}/line`)} fullWidth>
+              Open Line Chart
+            </Button>
+          </div>
         </Card>
       </div>
     </div>

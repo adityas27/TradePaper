@@ -9,6 +9,8 @@ import Portfolio from './pages/Portfolio';
 import TradeHistory from './pages/TradeHistory';
 import Watchlist from './pages/Watchlist';
 import TickerDetails from './pages/TickerDetails';
+import CandleChartPage from './pages/CandleChartPage';
+import LineChartPage from './pages/LineChartPage';
 import Leaderboard from './pages/Leaderboard';
 import LearnTrading from './pages/LearnTrading';
 import Settings from './pages/Settings';
@@ -51,6 +53,8 @@ function App() {
               <Route path="profile" element={<Profile />} />
               <Route path="market" element={<Market />} />
               <Route path="ticker/:symbol" element={<TickerDetails />} />
+              <Route path="ticker/:symbol/candles" element={<CandleChartPage />} />
+              <Route path="ticker/:symbol/line" element={<LineChartPage />} />
               <Route path="portfolio" element={<Portfolio />} />
               <Route path="trade-history" element={<TradeHistory />} />
               <Route path="watchlist" element={<Watchlist />} />

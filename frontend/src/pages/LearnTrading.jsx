@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { CheckCircle } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 
@@ -547,9 +548,11 @@ export default function LearnTrading() {
                   className={`module-link ${activeModule === index ? 'active' : ''}`}
                   onClick={() => setActiveModule(index)}
                 >
-                  <span className="module-check">
-                    {completedModules.includes(module.id) ? '✓' : ''}
-                  </span>
+                  {completedModules.includes(module.id) ? (
+                    <CheckCircle size={18} className="module-check-icon" />
+                  ) : (
+                    <span className="module-check-placeholder" />
+                  )}
                   {index + 1}. {module.title}
                 </button>
               ))}

@@ -1,0 +1,135 @@
+.portfolio-holdings {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding: 0;
+}
+
+.chart-title {
+  margin: 0;
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.holdings-tooltip {
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  padding: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+}
+
+.tooltip-ticker {
+  margin: 0 0 8px 0;
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.tooltip-row {
+  margin: 4px 0;
+  font-size: 12px;
+  color: var(--text-secondary);
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.tooltip-row.pnl-row {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px solid var(--border-color);
+  font-weight: 600;
+}
+
+.tooltip-row.pnl-row.positive {
+  color: #22c55e;
+}
+
+.tooltip-row.pnl-row.negative {
+  color: #ef4444;
+}
+
+.empty-state {
+  text-align: center;
+  padding: 32px 16px;
+  color: var(--text-secondary);
+  font-size: 13px;
+}
+
+.holdings-list {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 12px;
+  margin-top: 12px;
+}
+
+.holding-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: var(--bg-secondary);
+  border: 1px solid var(--border-color);
+  border-radius: 6px;
+  transition: all 0.2s ease;
+}
+
+.holding-row:hover {
+  border-color: var(--accent-color, #1f8ef1);
+  background: var(--bg-primary);
+}
+
+.holding-info {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.holding-ticker {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.holding-qty {
+  font-size: 11px;
+  color: var(--text-secondary);
+}
+
+.holding-value {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 4px;
+}
+
+.holding-value .value {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.holding-value .pnl {
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.holding-value .pnl.positive {
+  color: #22c55e;
+}
+
+.holding-value .pnl.negative {
+  color: #ef4444;
+}
+
+@media (max-width: 768px) {
+  .chart-title {
+    font-size: 14px;
+  }
+
+  .holdings-list {
+    grid-template-columns: 1fr;
+  }
+}

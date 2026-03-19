@@ -17,3 +17,4 @@ sqlparse==0.5.3
 tzdata==2025.2
 uvicorn[standard]==0.32.0
 websockets==13.1
+yfinance==0.2.54

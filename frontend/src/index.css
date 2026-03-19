@@ -11,6 +11,14 @@
   --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.1);
   --sidebar-bg: #ffffff;
   --topbar-bg: #ffffff;
+  
+  /* Extended CSS Variables */
+  --bg-primary: #ffffff;
+  --bg-secondary: #f5f5f7;
+  --text-primary: #1d1d1f;
+  --text-secondary: #6e6e73;
+  --border-color-light: #e5e5e7;
+  --accent-color: #2997ff;
 }
 
 /* Dark Mode */
@@ -26,6 +34,14 @@ body.dark {
   --shadow-hover: 0 4px 16px rgba(0, 0, 0, 0.35);
   --sidebar-bg: #1d1d1f;
   --topbar-bg: #1d1d1f;
+  
+  /* Extended CSS Variables */
+  --bg-primary: #2d2d2f;
+  --bg-secondary: #424245;
+  --text-primary: #f5f5f7;
+  --text-secondary: #a1a1a6;
+  --border-color-light: #555;
+  --accent-color: #2997ff;
 }
 
 /* Reset & Base */
@@ -346,6 +362,15 @@ body.dark .topbar {
   opacity: 0.9;
 }
 
+.card-icon-svg {
+  width: 24px;
+  height: 24px;
+  margin-bottom: 12px;
+  color: var(--primary-color, #0071e3);
+  opacity: 0.85;
+  stroke-width: 2;
+}
+
 .summary-card .card-value {
   font-size: 26px;
 }
@@ -365,6 +390,24 @@ body.dark .topbar {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
   gap: 24px;
+}
+
+.performance-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 24px;
+}
+
+.performance-grid-bottom {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+}
+
+@media (max-width: 1024px) {
+  .performance-grid-bottom {
+    grid-template-columns: 1fr;
+  }
 }
 
 .chart-placeholder {
@@ -856,6 +899,17 @@ body.dark .module-link.active {
   flex-shrink: 0;
 }
 
+.module-check-icon {
+  color: var(--primary-color);
+  flex-shrink: 0;
+}
+
+.module-check-placeholder {
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+}
+
 .module-link:not(.active) .module-check {
   display: none;
 }
@@ -1085,6 +1139,40 @@ body.dark .badge-sell {
 
 .btn-danger:hover:not(:disabled) {
   box-shadow: 0 2px 8px rgba(255, 59, 48, 0.35);
+}
+
+/* Button with icon */
+.btn-with-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.watchlist-btn {
+  padding: 6px 8px;
+  border-radius: 6px;
+  background: none;
+  border: 1px solid var(--border-color);
+  color: var(--text-color);
+  cursor: pointer;
+  transition: all 0.2s ease;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 500;
+}
+
+.watchlist-btn:hover {
+  background-color: var(--bg-secondary);
+  border-color: #fbbf24;
+  color: #fbbf24;
 }
 
 /* Modal */

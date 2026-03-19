@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { Star, Zap } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
 import RiskMeter from '../components/ui/RiskMeter';
@@ -277,11 +278,15 @@ export default function Market() {
 
                         <td>
                           <button
-                            className="icon-btn"
+                            className="icon-btn watchlist-btn"
                             onClick={() => toggleWatchlist(stock.symbol)}
-                            style={{ color: inWatchlist ? '#FFD700' : 'inherit' }}
+                            title={inWatchlist ? 'Remove from watchlist' : 'Add to watchlist'}
                           >
-                            {inWatchlist ? '★' : '☆'}
+                            <Star
+                              size={20}
+                              fill={inWatchlist ? 'currentColor' : 'none'}
+                              color={inWatchlist ? '#fbbf24' : 'currentColor'}
+                            />
                           </button>
                         </td>
                       </tr>

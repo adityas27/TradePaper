@@ -168,7 +168,7 @@ export default function Portfolio() {
         </section>
 
         <section>
-          <Card>
+          {/* <Card>
             <h3 className="card-title">Diversification Score</h3>
             <div className="diversification-placeholder">
               <div
@@ -188,7 +188,7 @@ export default function Portfolio() {
             <p className="card-description">
               A higher diversification score indicates your portfolio is spread across different stocks.
             </p>
-          </Card>
+          </Card> */}
         </section>
       </div>
     </div>

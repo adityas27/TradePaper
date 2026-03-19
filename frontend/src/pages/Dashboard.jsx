@@ -1,7 +1,11 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
+import { TrendingUp, DollarSign, Wallet, PieChart } from 'lucide-react';
 import Card from '../components/ui/Card';
 import Button from '../components/ui/Button';
+import PortfolioAllocation from '../components/PortfolioAllocation';
+import PortfolioGrowth from '../components/PortfolioGrowth';
+import PortfolioHoldings from '../components/PortfolioHoldings';
 import { useTrading } from '../context/TradingContext';
 
 export default function Dashboard() {
@@ -56,21 +60,21 @@ export default function Dashboard() {
 
           <div className="cards-grid cards-grid-2">
             <Card className="summary-card summary-card-investment">
-              <span className="card-icon">📊</span>
+              <PieChart className="card-icon-svg" />
               <h3 className="card-title">Total Investment</h3>
               <p className="card-value">{formatCurrency(totalInvestment)}</p>
               <p className="card-subtitle">Total cost basis</p>
             </Card>
 
             <Card className="summary-card summary-card-value">
-              <span className="card-icon">💰</span>
+              <DollarSign className="card-icon-svg" />
               <h3 className="card-title">Current Portfolio Value</h3>
               <p className="card-value">{formatCurrency(currentPortfolioValue)}</p>
               <p className="card-subtitle">Based on current prices</p>
             </Card>
 
             <Card className="summary-card summary-card-pnl">
-              <span className="card-icon">📈</span>
+              <TrendingUp className="card-icon-svg" />
               <h3 className="card-title">Profit / Loss</h3>
               <p className={`card-value ${profitLoss >= 0 ? 'text-positive' : 'text-negative'}`}>
                 {profitLoss >= 0 ? '+' : ''}{formatCurrency(profitLoss)}
@@ -79,7 +83,7 @@ export default function Dashboard() {
             </Card>
 
             <Card className="summary-card summary-card-balance">
-              <span className="card-icon">💵</span>
+              <Wallet className="card-icon-svg" />
               <h3 className="card-title">Available Balance</h3>
               <p className="card-value">{formatCurrency(balance)}</p>
               <p className="card-subtitle">Cash available</p>
@@ -143,18 +147,23 @@ export default function Dashboard() {
         </section>
 
         <section>
-          <Card className="performance-card">
-            <h3 className="card-title">Portfolio Performance</h3>
+          <h2 className="section-title">Performance</h2>
 
-            <div className="chart-placeholder-area">
-              <span className="chart-placeholder-icon">📉</span>
-              Chart placeholder
+          <div className="performance-grid">
+            <Card>
+              <PortfolioGrowth holdings={holdings} prices={prices} balance={balance} />
+            </Card>
+
+            <div className="performance-grid-bottom">
+              <Card>
+                <PortfolioAllocation holdings={holdings} prices={prices} balance={balance} />
+              </Card>
+
+              <Card>
+                <PortfolioHoldings holdings={holdings} prices={prices} />
+              </Card>
             </div>
-
-            <p className="chart-caption">
-              Performance data will appear here when available.
-            </p>
-          </Card>
+          </div>
         </section>
 
         <section>

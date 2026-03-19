@@ -1,0 +1,125 @@
+.yf-line-chart {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.yf-line-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border-color);
+}
+
+.yf-line-header label {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--text-secondary);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+
+.yf-line-header select {
+  min-width: 90px;
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.yf-line-header select:hover {
+  border-color: var(--accent-color, #1f8ef1);
+}
+
+.yf-line-header select:focus {
+  outline: none;
+  border-color: var(--accent-color, #1f8ef1);
+  box-shadow: 0 0 0 3px rgba(31, 142, 241, 0.1);
+}
+
+.manual-refresh {
+  border: 1px solid var(--border-color);
+  background-color: var(--bg-secondary);
+  color: var(--text-primary);
+  border-radius: 6px;
+  padding: 6px 12px;
+  cursor: pointer;
+  font-weight: 600;
+  font-size: 12px;
+  transition: all 0.2s ease;
+}
+
+.manual-refresh:hover {
+  background-color: var(--accent-color, #1f8ef1);
+  border-color: var(--accent-color, #1f8ef1);
+  color: #fff;
+}
+
+.manual-refresh:active {
+  transform: scale(0.98);
+}
+
+.last-update {
+  margin-left: auto;
+  font-size: 12px;
+  color: var(--text-secondary);
+  font-style: italic;
+}
+
+.chart-meta,
+.chart-error {
+  margin: 0;
+  font-size: 13px;
+  padding: 12px;
+  border-radius: 6px;
+}
+
+.chart-meta {
+  color: var(--text-secondary);
+  background: var(--bg-secondary);
+}
+
+.chart-error {
+  color: #dc2626;
+  background: rgba(220, 38, 38, 0.1);
+  border-left: 3px solid #dc2626;
+}
+
+.yf-chart-canvas {
+  width: 100%;
+  min-height: 360px;
+}
+
+@media (max-width: 768px) {
+  .yf-line-header {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .yf-line-header label {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  .yf-line-header select {
+    width: 100%;
+  }
+
+  .last-update {
+    margin-left: 0;
+    order: -1;
+  }
+
+  .manual-refresh {
+    width: 100%;
+  }
+}
