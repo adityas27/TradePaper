@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate, useLocation } from 'react-router-dom';
 import { ThemeProvider } from './context/ThemeContext';
 import { LearningModeProvider } from './context/LearningModeContext';
 import { TradingProvider } from './context/TradingContext';
@@ -16,6 +16,17 @@ import Profile from './pages/Profile';
 import Login from './components/Login';
 import SignUp from './components/SignUp';
 
+function RequireAuth({ children }) {
+  const location = useLocation();
+  const access = typeof window !== 'undefined' ? localStorage.getItem('access') : null;
+
+  if (!access) {
+    return <Navigate to="/login" state={{ from: location }} replace />;
+  }
+
+  return children;
+}
+
 function App() {
   return (
     <ThemeProvider>
@@ -23,10 +34,20 @@ function App() {
         <TradingProvider>
         <BrowserRouter>
           <Routes>
-            <Route path="/" element={<Layout />}>
+            {/* Public auth routes */}
+            <Route path="/login" element={<Login />} />
+            <Route path="/signup" element={<SignUp />} />
+
+            {/* Protected app routes */}
+            <Route
+              path="/"
+              element={
+                <RequireAuth>
+                  <Layout />
+                </RequireAuth>
+              }
+            >
               <Route index element={<Dashboard />} />
-              <Route path="login" element={<Login />} />
-              <Route path="signup" element={<SignUp />} />
               <Route path="profile" element={<Profile />} />
               <Route path="market" element={<Market />} />
               <Route path="ticker/:symbol" element={<TickerDetails />} />
@@ -37,6 +58,9 @@ function App() {
               <Route path="learn-trading" element={<LearnTrading />} />
               <Route path="settings" element={<Settings />} />
             </Route>
+
+            {/* Fallback: redirect unknown routes to login */}
+            <Route path="*" element={<Navigate to="/login" replace />} />
           </Routes>
         </BrowserRouter>
         </TradingProvider>

@@ -4,6 +4,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from django.shortcuts import get_object_or_404
 from django.db import transaction
+from django.db.models import Sum  # kept for potential future use
 from decimal import Decimal
 from .models import Ticker, Portfolio, Position, TradeTransaction, Watchlist
 from .serializers import (
@@ -280,3 +281,64 @@ def trade_sell(request):
         },
         status=status.HTTP_201_CREATED,
     )
+
+
+# ============================================================================
+# LEADERBOARD VIEW
+# ============================================================================
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def leaderboard(request):
+    """
+    Leaderboard ranked by total portfolio value:
+      total_value = cash balance + sum(position.quantity * live_price)
+      net_profit  = total_value - 10,000 (starting balance per portfolio)
+    """
+    STARTING_BALANCE = Decimal('10000')
+
+    # Use each user's primary (oldest) portfolio only
+    portfolios = (
+        Portfolio.objects
+        .select_related('user')
+        .prefetch_related('positions__ticker')
+        .order_by('user', 'created_at')
+    )
+
+    # Keep only the first portfolio per user
+    seen_users = set()
+    primary_portfolios = []
+    for portfolio in portfolios:
+        if portfolio.user_id not in seen_users:
+            seen_users.add(portfolio.user_id)
+            primary_portfolios.append(portfolio)
+
+    # Cache live prices so we only call the service once per symbol
+    price_cache = {}
+
+    def live_price(symbol):
+        if symbol not in price_cache:
+            data = get_live_price(symbol)
+            price_cache[symbol] = Decimal(str(data.get('price') or 0))
+        return price_cache[symbol]
+
+    results = []
+    for portfolio in primary_portfolios:
+        holdings_value = sum(
+            pos.quantity * live_price(pos.ticker.symbol)
+            for pos in portfolio.positions.all()
+        )
+        total_value = portfolio.balance + holdings_value
+        net_profit = total_value - STARTING_BALANCE
+        results.append({
+            'username': portfolio.user.username,
+            'portfolio_value': float(round(total_value, 2)),
+            'net_profit': float(round(net_profit, 2)),
+        })
+
+    # Sort by total value descending and assign ranks
+    results.sort(key=lambda x: x['portfolio_value'], reverse=True)
+    for idx, row in enumerate(results, start=1):
+        row['rank'] = idx
+
+    return Response(results)

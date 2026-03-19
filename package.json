@@ -1,0 +1,13 @@
+{
+  "name": "tradepaper",
+  "version": "1.0.0",
+  "scripts": {
+    "dev": "concurrently --names \"django,tickers,frontend\" --prefix-colors \"blue,yellow,green\" \"npm run backend\" \"npm run tickers\" \"npm run frontend\"",
+    "backend": "C:/Users/Harsh/TradePaper/TradePaper/.venv/Scripts/python.exe C:/Users/Harsh/TradePaper/TradePaper/backend/manage.py runserver",
+    "tickers": "C:/Users/Harsh/TradePaper/TradePaper/.venv/Scripts/uvicorn.exe app:app --port 8001 --reload --reload-dir C:/Users/Harsh/TradePaper/TradePaper/backend/tickers --app-dir C:/Users/Harsh/TradePaper/TradePaper/backend/tickers",
+    "frontend": "npm run dev --prefix C:/Users/Harsh/TradePaper/TradePaper/frontend"
+  },
+  "devDependencies": {
+    "concurrently": "^9.2.1"
+  }
+}

@@ -143,7 +143,8 @@ REST_FRAMEWORK = {
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",
     "http://localhost:5173",  # React dev server
+    "http://localhost:5174",  # React dev server (alternate port)
     "http://192.168.0.241:3000", # React dev server on local network
-    ]
+]
 
 AUTH_USER_MODEL = 'accounts.CustomUser'
