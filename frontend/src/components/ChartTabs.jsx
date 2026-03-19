@@ -71,74 +71,76 @@ export default function ChartTabs({ data, symbol }) {
   }
 
   return (
-    <div className="chart-tabs-container">
-      {/* Chart Type Tabs */}
-      <div className="chart-tabs-header">
-        <div className="chart-type-tabs">
-          {chartTypes.map(chart => (
-            <button
-              key={chart.value}
-              className={`tab-button ${activeChart === chart.value ? 'active' : ''}`}
-              onClick={() => setActiveChart(chart.value)}
-            >
-              {chart.label}
-            </button>
-          ))}
+    <>
+      {/* <div className="chart-tabs-container"> */}
+        {/* Chart Type Tabs */}
+        <div className="chart-tabs-header">
+          <div className="chart-type-tabs">
+            {chartTypes.map(chart => (
+              <button
+                key={chart.value}
+                className={`tab-button ${activeChart === chart.value ? 'active' : ''}`}
+                onClick={() => setActiveChart(chart.value)}
+              >
+                {chart.label}
+              </button>
+            ))}
+          </div>
+
+          {/* Timeframe Selector */}
+          <div className="timeframe-selector">
+            {timeframes.map(tf => (
+              <button
+                key={tf.value}
+                className={`timeframe-button ${timeframe === tf.value ? 'active' : ''}`}
+                onClick={() => setTimeframe(tf.value)}
+              >
+                {tf.label}
+              </button>
+            ))}
+          </div>
         </div>
 
-        {/* Timeframe Selector */}
-        <div className="timeframe-selector">
-          {timeframes.map(tf => (
-            <button
-              key={tf.value}
-              className={`timeframe-button ${timeframe === tf.value ? 'active' : ''}`}
-              onClick={() => setTimeframe(tf.value)}
-            >
-              {tf.label}
-            </button>
-          ))}
+        {/* Chart Display */}
+        <div className="chart-content">
+          {activeChart === 'candlestick' && (
+            <Candlestick data={filteredData} symbol={symbol} timeframe={timeframe} />
+          )}
+          {activeChart === 'histogram' && (
+            <Histogram data={filteredData} symbol={symbol} timeframe={timeframe} />
+          )}
         </div>
-      </div>
 
-      {/* Chart Display */}
-      <div className="chart-content">
-        {activeChart === 'candlestick' && (
-          <Candlestick data={filteredData} symbol={symbol} timeframe={timeframe} />
-        )}
-        {activeChart === 'histogram' && (
-          <Histogram data={filteredData} symbol={symbol} timeframe={timeframe} />
-        )}
-      </div>
-
-      {/* Data Info */}
-      <div className="chart-info">
-        <div className="info-item">
-          <span className="info-label">Timeframe:</span>
-          <span className="info-value">
-            {timeframes.find(t => t.value === timeframe)?.label}
-          </span>
+        {/* Data Info */}
+        <div className="chart-info">
+          <div className="info-item">
+            <span className="info-label">Timeframe:</span>
+            <span className="info-value">
+              {timeframes.find(t => t.value === timeframe)?.label}
+            </span>
+          </div>
+          <div className="info-item">
+            <span className="info-label">Data Points:</span>
+            <span className="info-value">{filteredData.length}</span>
+          </div>
+          {filteredData.length > 0 && (
+            <>
+              <div className="info-item">
+                <span className="info-label">High:</span>
+                <span className="info-value">
+                  ${Math.max(...filteredData.map(d => d.high || d.close)).toFixed(2)}
+                </span>
+              </div>
+              <div className="info-item">
+                <span className="info-label">Low:</span>
+                <span className="info-value">
+                  ${Math.min(...filteredData.map(d => d.low || d.close)).toFixed(2)}
+                </span>
+              </div>
+            </>
+          )}
         </div>
-        <div className="info-item">
-          <span className="info-label">Data Points:</span>
-          <span className="info-value">{filteredData.length}</span>
-        </div>
-        {filteredData.length > 0 && (
-          <>
-            <div className="info-item">
-              <span className="info-label">High:</span>
-              <span className="info-value">
-                ${Math.max(...filteredData.map(d => d.high || d.close)).toFixed(2)}
-              </span>
-            </div>
-            <div className="info-item">
-              <span className="info-label">Low:</span>
-              <span className="info-value">
-                ${Math.min(...filteredData.map(d => d.low || d.close)).toFixed(2)}
-              </span>
-            </div>
-          </>
-        )}
-      </div>
-    </div>
+      {/* </div> */}
+    </>
   );
 }
